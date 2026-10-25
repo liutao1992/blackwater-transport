@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1115" />
+  <meta name="description" content="运输船：一款可直接在浏览器中游玩的 3D 团队枪战。三线交火、真实遮挡、战术 AI。" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <title>运输船 · BLACKWATER</title>
+  <script type="module" crossorigin src="./assets/index-LXKM8qPu.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/three-DXIuC6bA.js">
+  <link rel="stylesheet" crossorigin href="./assets/index-DfZHDRKV.css">
+</head>
+<body>
+  <svg class="svg-defs" aria-hidden="true">
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1.8 7M4 10V4m0 6h6" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m4 11 8-7 8 7v9h-6v-6h-4v6H4z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h10m4 0h2M4 17h3m4 0h9M14 4v6M7 14v6" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20S4 15.4 4 9.5A4.5 4.5 0 0 1 12 6.7a4.5 4.5 0 0 1 8 2.8C20 15.4 12 20 12 20Z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 4.7-3.4 7.7-8 9-4.6-1.3-8-4.3-8-9V6z" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6L8 10zm12-1c1.8 1.7 1.8 4.3 0 6m2-9c3.8 3.3 3.8 8.7 0 12" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+  </svg>
+
+  <main id="app">
+    <canvas id="game-canvas" aria-label="运输船三维战场。进入后使用 WASD 移动、鼠标瞄准和射击。" tabindex="-1"></canvas>
+    <div class="film-grain" aria-hidden="true"></div>
+    <div id="damage-vignette" aria-hidden="true"></div>
+
+    <section id="loading-screen" class="screen loading-screen" aria-live="polite">
+      <div class="loading-mark"><span></span><span></span><span></span></div>
+      <p class="mono">INITIALIZING COMBAT SPACE</p>
+      <h2>正在装载运输船</h2>
+      <div class="loading-track"><i></i></div>
+      <p id="loading-status">构建甲板、导航系统与光照…</p>
+    </section>
+
+    <section id="menu-screen" class="screen menu-screen is-hidden" aria-labelledby="game-title">
+      <header class="menu-header">
+        <a class="brand" href="#" aria-label="Blackwater 首页" onclick="return false">
+          <span class="brand-mark">B<span>/</span>W</span>
+          <span>BLACKWATER<small>TACTICAL SIMULATION</small></span>
+        </a>
+        <div class="local-status"><i></i> 本地战术演训 <span>4 × 4</span></div>
+      </header>
+      <div class="briefing">
+        <div class="sector mono"><span>作战海域 07</span><b>北大西洋 / 18:40</b></div>
+        <h1 id="game-title">运输船</h1>
+        <p class="title-en">TRANSPORT</p>
+        <p class="brief-copy">狭长甲板，三线交火。穿过中央集装箱交接区，与小队夺取这艘货轮的控制权。</p>
+        <div class="mission-spec">
+          <div><span>模式</span><strong>团队竞技</strong></div>
+          <div><span>编制</span><strong>4 VS 4</strong></div>
+          <div><span>胜利条件</span><strong>30 击杀 / 04:00</strong></div>
+        </div>
+        <button id="start-button" class="primary-button" type="button">
+          <span><svg><use href="#i-play"/></svg>进入战场</span>
+          <kbd>ENTER</kbd>
+        </button>
+        <details class="settings-panel">
+          <summary><svg><use href="#i-settings"/></svg>战术设置<span>自定义演训参数</span></summary>
+          <div class="settings-body">
+            <label>画面质量<select data-setting="quality"><option value="high">高 · 完整光影</option><option value="medium">中 · 平衡性能</option><option value="low">低 · 帧率优先</option></select></label>
+            <label>敌人强度<select data-setting="difficulty"><option value="recruit">新兵</option><option value="regular" selected>精英</option><option value="veteran">传奇</option></select></label>
+            <label>鼠标灵敏度<span class="setting-value" data-value="sensitivity">0.75</span><input data-setting="sensitivity" type="range" min="0.2" max="1.5" value="0.75" step="0.05" /></label>
+            <label>主音量<span class="setting-value" data-value="volume">75%</span><input data-setting="volume" type="range" min="0" max="1" value="0.75" step="0.05" /></label>
+          </div>
+        </details>
+      </div>
+      <aside class="live-tag"><span class="live-line"></span><div><i></i> REAL-TIME 3D<small>程序化材质 / 动态海面 / 战术 AI</small></div></aside>
+      <footer class="menu-footer">
+        <div class="quick-controls">
+          <span><kbd>W A S D</kbd>移动</span><span><kbd>鼠标</kbd>瞄准</span><span><kbd>左键</kbd>射击</span><span><kbd>右键</kbd>机瞄</span><span><kbd>R</kbd>换弹</span><span><kbd>SHIFT</kbd>冲刺</span>
+        </div>
+        <p>非官方粉丝重制 · 建议使用键鼠与耳机</p>
+      </footer>
+    </section>
+
+    <section id="hud" class="hud is-hidden" aria-label="战斗信息">
+      <div class="minimap-wrap">
+        <div class="minimap-heading"><span>运输船 / 甲板</span><b>N</b></div>
+        <canvas id="minimap" width="320" height="360" aria-label="战术小地图"></canvas>
+        <div class="minimap-footer"><span><i class="ally-dot"></i>友军</span><span>07 · ALPHA</span></div>
+      </div>
+      <div class="match-strip">
+        <div class="team-score blue"><span>守卫者</span><strong id="blue-score">0</strong></div>
+        <div class="round-clock"><span>团队竞技</span><time id="round-time">04:00</time><small>目标 30</small></div>
+        <div class="team-score red"><strong id="red-score">0</strong><span>潜伏者</span></div>
+      </div>
+      <div id="kill-feed" class="kill-feed" aria-live="polite"></div>
+      <div id="friendly-markers" aria-hidden="true"></div>
+      <div id="crosshair" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
+      <div id="hitmarker" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div id="kill-confirmation" aria-live="polite"></div>
+      <div class="vitals">
+        <div class="vital-number"><svg><use href="#i-heart"/></svg><strong id="health-value">100</strong><span>生命</span></div>
+        <div class="vital-bars"><div><i id="health-bar"></i></div><span>COMBAT CONDITION</span></div>
+        <div class="armor-number"><svg><use href="#i-shield"/></svg><strong id="armor-value">100</strong></div>
+      </div>
+      <div class="ammo-panel">
+        <div class="weapon-meta"><span id="weapon-role">突击步枪</span><strong id="weapon-name">M4A1</strong></div>
+        <div class="ammo-count"><strong id="ammo-value">30</strong><span>/ <b id="reserve-value">90</b></span></div>
+        <div id="reload-indicator"><span>正在更换弹匣</span><i><b></b></i></div>
+        <div class="weapon-slots"><span data-slot="0" class="active"><kbd>1</kbd>M4</span><span data-slot="1"><kbd>2</kbd>AK</span><span data-slot="2"><kbd>3</kbd>手枪</span></div>
+      </div>
+      <div class="stance-indicator"><span id="stance-text">站立</span><i></i><span id="fire-mode">全自动</span></div>
+      <div class="hud-help"><kbd>TAB</kbd> 战绩 <span>·</span> <kbd>ESC</kbd> 暂停</div>
+    </section>
+
+    <section id="respawn-screen" class="respawn-screen is-hidden" aria-live="assertive">
+      <p>作战人员阵亡</p><h2>重新部署</h2><strong id="respawn-count">3.2</strong><span id="killer-name">敌方火力</span><small>观察换路时机，避免重复暴露在同一条枪线。</small>
+    </section>
+
+    <section id="pause-screen" class="screen overlay-screen is-hidden" aria-labelledby="pause-title" role="dialog" aria-modal="true">
+      <div class="overlay-panel">
+        <p class="overlay-code mono">TACTICAL HOLD / 07</p><h2 id="pause-title">战术暂停</h2><p id="pause-message">战场已冻结，继续时重新锁定鼠标。</p>
+        <button id="resume-button" class="primary-button" type="button"><span><svg><use href="#i-play"/></svg>继续战斗</span><kbd>ESC</kbd></button>
+        <button id="restart-button" class="secondary-button" type="button"><svg><use href="#i-restart"/></svg>重新开始</button>
+        <button id="menu-button" class="text-button" type="button"><svg><use href="#i-home"/></svg>返回任务简报</button>
+        <div class="pause-settings">
+          <label>鼠标灵敏度<input data-setting="sensitivity" type="range" min="0.2" max="1.5" value="0.75" step="0.05" /></label>
+          <label>主音量<input data-setting="volume" type="range" min="0" max="1" value="0.75" step="0.05" /></label>
+        </div>
+        <div class="controls-grid"><span><kbd>WASD</kbd>移动</span><span><kbd>SPACE</kbd>跳跃</span><span><kbd>C / CTRL</kbd>蹲伏</span><span><kbd>1 / 2 / 3</kbd>切换武器</span><span><kbd>R</kbd>换弹</span><span><kbd>滚轮</kbd>循环武器</span></div>
+      </div>
+    </section>
+
+    <section id="end-screen" class="screen overlay-screen is-hidden" aria-labelledby="result-title" role="dialog" aria-modal="true">
+      <div class="debrief-panel">
+        <p class="overlay-code mono">AFTER ACTION REPORT / 07</p><h2 id="result-title">行动完成</h2>
+        <div class="final-score"><strong id="final-blue">30</strong><span>最终比分<small>守卫者 / 潜伏者</small></span><strong id="final-red">18</strong></div>
+        <div class="personal-stats"><div><strong id="stat-kills">0</strong><span>击杀</span></div><div><strong id="stat-deaths">0</strong><span>阵亡</span></div><div><strong id="stat-headshots">0</strong><span>爆头</span></div><div><strong id="stat-accuracy">0%</strong><span>命中率</span></div></div>
+        <div class="scoreboard-scroll"><table><thead><tr><th>作战人员</th><th>阵营</th><th>击杀</th><th>阵亡</th><th>K/D</th></tr></thead><tbody id="end-scoreboard"></tbody></table></div>
+        <div class="debrief-actions"><button id="play-again-button" class="primary-button" type="button"><span><svg><use href="#i-restart"/></svg>再来一局</span></button><button id="end-menu-button" class="secondary-button" type="button"><svg><use href="#i-home"/></svg>任务简报</button></div>
+      </div>
+    </section>
+
+    <section id="scoreboard-overlay" class="scoreboard-overlay is-hidden" aria-label="实时战绩">
+      <div><p class="mono">LIVE OPERATION / 07</p><h2>实时战绩</h2><table><thead><tr><th>作战人员</th><th>阵营</th><th>击杀</th><th>阵亡</th><th>K/D</th></tr></thead><tbody id="live-scoreboard"></tbody></table></div>
+    </section>
+
+    <div id="deployment-hint" class="deployment-hint is-hidden" role="status"><span class="spinner"></span>正在进入战场…</div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div class="mobile-notice">完整战斗需要键盘与鼠标。请在桌面浏览器中打开。</div>
+  </main>
+</body>
+</html>
