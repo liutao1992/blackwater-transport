@@ -30,7 +30,7 @@
   - Verify: `pnpm test`、`pnpm run build`、ego-browser。
   - Files: `tests/*`, `scripts/*`, `artifacts/*`
 
-- [ ] 7. 部署到公开 CDN 并复验
+- [x] 7. 部署到公开 CDN 并复验
   - Acceptance: 获得可匿名打开的 HTTPS 链接，重新加载后资源与游戏可用。
   - Verify: 公开 URL 浏览器检查及网络状态检查。
   - Files: `dist/*`, `artifacts/deployment.md`
