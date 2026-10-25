@@ -1,0 +1,12 @@
+node_modules/
+.pnpm-store/
+.pnpm/
+dist/
+artifacts/
+.DS_Store
+*.log
+.netlify/
+.vercel/
+.env
+.env.*
+!.env.example

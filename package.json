@@ -1,0 +1,21 @@
+{
+  "name": "blackwater-transport",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A browser-based tactical FPS inspired by the classic transport ship arena.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@fontsource/barlow-condensed": "^5.2.6",
+    "@fontsource/ibm-plex-mono": "^5.2.6",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7"
+  }
+}
