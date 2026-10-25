@@ -158,7 +158,7 @@ export class Bot {
 
   takeDamage(amount, source, headshot = false) {
     if (!this.alive || this.spawnProtection > 0) return 0;
-    const dealt = applyDamage(this, amount, source);
+    const dealt = applyDamage(this, amount, source, headshot);
     if (this.alive && source && source.team !== this.team) {
       this.target = source;
       this.lastSeen.copy(source.position);
@@ -368,6 +368,11 @@ export class BotManager {
   }
 
   reset() { this.bots.forEach((bot) => bot.reset()); }
-  update(dt) { this.bots.forEach((bot) => bot.update(dt)); }
+  update(dt) {
+    for (const bot of this.bots) {
+      if (this.game.state !== 'running') break;
+      bot.update(dt);
+    }
+  }
   getOpponents(team) { return this.bots.filter((bot) => bot.team !== team && bot.alive); }
 }

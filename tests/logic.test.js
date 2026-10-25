@@ -14,6 +14,17 @@ test('applyDamage clamps health and attributes a single death', () => {
   assert.equal(target.health, 0);
 });
 
+test('applyDamage preserves a lethal headshot and only kills once', () => {
+  const kills = [];
+  const target = { health: 20, alive: true, kill(source, headshot) { this.alive = false; kills.push({ source, headshot }); } };
+  const source = { name: 'attacker' };
+  assert.equal(applyDamage(target, 100, source, true), 20);
+  assert.equal(applyDamage(target, 100, source, true), 0);
+  assert.equal(kills.length, 1);
+  assert.equal(kills[0].source, source);
+  assert.equal(kills[0].headshot, true);
+});
+
 test('applyDamage rejects invalid or friendly zero damage', () => {
   const target = { health: 100, alive: true };
   for (const value of [0, -5, NaN, Infinity]) assert.equal(applyDamage(target, value), 0);

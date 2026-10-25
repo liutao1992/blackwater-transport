@@ -225,6 +225,7 @@ export class TransportGame {
   }
 
   registerKill(victim, killer, headshot) {
+    if (this.state !== 'running') return;
     if (killer && killer !== victim && killer.team !== victim.team) {
       killer.kills = (killer.kills || 0) + 1;
       this.scores[killer.team]++;
@@ -289,7 +290,9 @@ export class TransportGame {
     if (this.roundTime <= 0) { this.endRound(); return; }
     this.player.update(dt);
     this.weapons.update(dt);
+    if (this.state !== 'running') return;
     this.bots.update(dt);
+    if (this.state !== 'running') return;
     this.effects.update(dt);
     this.audio.updateListener(this.player.eyePosition, this.player.yaw);
 

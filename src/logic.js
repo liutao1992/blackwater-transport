@@ -7,11 +7,11 @@ export function formatTime(seconds) {
   return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
 }
 
-export function applyDamage(target, amount, source) {
+export function applyDamage(target, amount, source, headshot = false) {
   if (!target?.alive || !Number.isFinite(amount) || amount <= 0) return 0;
   const dealt = Math.min(target.health, amount);
   target.health = Math.max(0, target.health - amount);
-  if (target.health === 0 && typeof target.kill === 'function') target.kill(source);
+  if (target.health === 0 && typeof target.kill === 'function') target.kill(source, headshot);
   return dealt;
 }
 
